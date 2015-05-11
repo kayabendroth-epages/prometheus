@@ -152,8 +152,6 @@ func (p *parser) parseSeriesDesc() (m clientmodel.Metric, vals []sequenceValue, 
 		m[clientmodel.MetricNameLabel] = clientmodel.LabelValue(name)
 	}
 
-	blank := sequenceValue{Omitted: true}
-
 	const ctx = "series values"
 	for {
 		if p.peek().typ == itemEOF {
@@ -172,7 +170,7 @@ func (p *parser) parseSeriesDesc() (m clientmodel.Metric, vals []sequenceValue, 
 				}
 			}
 			for i := uint64(0); i < times; i++ {
-				vals = append(vals, blank)
+				vals = append(vals, sequenceValue{Omitted: true})
 			}
 			continue
 		}
