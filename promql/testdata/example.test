@@ -1,0 +1,20 @@
+load 5m
+	http_requests{job="api-server", instance="0", group="production"} 0+10x10
+	http_requests{job="api-server", instance="1", group="production"} 0+20x10
+	http_requests{job="api-server", instance="0", group="canary"} 0+30x10
+	http_requests{job="api-server", instance="1", group="canary"} 0+40x10
+	http_requests{job="app-server", instance="0", group="production"} 0+50x10
+	http_requests{job="app-server", instance="1", group="production"} 0+60x10
+	http_requests{job="app-server", instance="0", group="canary"} 0+70x10
+	http_requests{job="app-server", instance="1", group="canary"} 0+80x10
+
+# comments here and there
+eval instant at 50m http_requests
+	http_requests{job="api-server", instance="0", group="production"} 100
+	http_requests{job="api-server", instance="1", group="production"} 200
+	http_requests{job="api-server", instance="0", group="canary"} 300
+	http_requests{job="api-server", instance="1", group="canary"} 400
+	http_requests{job="app-server", instance="0", group="production"} 500
+	http_requests{job="app-server", instance="1", group="production"} 600
+	http_requests{job="app-server", instance="0", group="canary"} 700
+	http_requests{job="app-server", instance="1", group="canary"} 800
