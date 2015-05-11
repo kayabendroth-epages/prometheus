@@ -20,9 +20,10 @@ import (
 )
 
 var tests = []struct {
-	input    string
-	expected []item
-	fail     bool
+	input      string
+	expected   []item
+	fail       bool
+	seriesDesc bool // Whether to lex a series description.
 }{
 	// Test common stuff.
 	{
@@ -355,6 +356,19 @@ var tests = []struct {
 	}, {
 		input: `]`, fail: true,
 	},
+	// Test series description.
+	{
+		input: `{} _ 1 x .3`,
+		expected: []item{
+			{itemLeftBrace, 0, `{`},
+			{itemRightBrace, 1, `}`},
+			{itemBlank, 3, `_`},
+			{itemNumber, 5, `1`},
+			{itemMUL, 7, `x`},
+			{itemNumber, 9, `.3`},
+		},
+		seriesDesc: true,
+	},
 }
 
 // TestLexer tests basic functionality of the lexer. More elaborate tests are implemented
@@ -362,6 +376,7 @@ var tests = []struct {
 func TestLexer(t *testing.T) {
 	for i, test := range tests {
 		l := lex(test.input)
+		l.seriesDesc = test.seriesDesc
 
 		out := []item{}
 		for it := range l.items {
