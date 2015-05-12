@@ -14,6 +14,7 @@
 package promql
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -370,20 +371,32 @@ func TestLexer(t *testing.T) {
 		lastItem := out[len(out)-1]
 		if test.fail {
 			if lastItem.typ != itemError {
-				t.Fatalf("%d: expected lexing error but did not fail", i)
+				t.Logf("%d: input %q", i, test.input)
+				t.Fatalf("expected lexing error but did not fail")
 			}
 			continue
 		}
 		if lastItem.typ == itemError {
-			t.Fatalf("%d: unexpected lexing error: %s", i, lastItem)
+			t.Logf("%d: input %q", i, test.input)
+			t.Fatalf("unexpected lexing error: %s", lastItem)
 		}
 
 		if !reflect.DeepEqual(lastItem, item{itemEOF, Pos(len(test.input)), ""}) {
-			t.Fatalf("%d: lexing error: expected output to end with EOF item", i)
+			t.Logf("%d: input %q", i, test.input)
+			t.Fatalf("lexing error: expected output to end with EOF item")
 		}
 		out = out[:len(out)-1]
 		if !reflect.DeepEqual(out, test.expected) {
-			t.Errorf("%d: lexing mismatch:\nexpected: %#v\n-----\ngot: %#v", i, test.expected, out)
+			t.Logf("%d: input %q", i, test.input)
+			t.Fatalf("lexing mismatch:\nexpected:\n%s\ngot:\n%s", expectedList(test.expected), expectedList(out))
 		}
 	}
+}
+
+func expectedList(exp []item) string {
+	s := ""
+	for _, it := range exp {
+		s += fmt.Sprintf("\t%#v\n", it)
+	}
+	return s
 }
