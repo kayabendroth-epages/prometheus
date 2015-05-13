@@ -5,6 +5,8 @@
 *.cgo*.go
 *.conf
 *.rules
+*.yml
+*.yaml
 *.exe
 *.orig
 *.pyc
