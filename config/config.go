@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"regexp"
@@ -252,6 +253,28 @@ func (tg TargetGroup) MarshalYAML() (interface{}, error) {
 		g.Targets = append(g.Targets, string(t[clientmodel.AddressLabel]))
 	}
 	return g, nil
+}
+
+// UnmarshalJSON implements the json.Unmarshaller interface.
+func (tg *TargetGroup) UnmarshalJSON(b []byte) error {
+	g := struct {
+		Targets []string             `yaml:"targets"`
+		Labels  clientmodel.LabelSet `yaml:"labels"`
+	}{}
+	if err := json.Unmarshal(b, &g); err != nil {
+		return err
+	}
+	tg.Targets = make([]clientmodel.LabelSet, 0, len(g.Targets))
+	for _, t := range g.Targets {
+		if strings.Contains(t, "/") {
+			return fmt.Errorf("%q is not a valid hostname", t)
+		}
+		tg.Targets = append(tg.Targets, clientmodel.LabelSet{
+			clientmodel.AddressLabel: clientmodel.LabelValue(t),
+		})
+	}
+	tg.Labels = g.Labels
+	return nil
 }
 
 // DNSSDConfig is the configuration for DNS based service discovery.
