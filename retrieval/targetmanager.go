@@ -15,6 +15,8 @@ package retrieval
 
 import (
 	"fmt"
+	"net"
+	"net/http"
 	"strings"
 	"sync"
 	"time"
@@ -60,6 +62,15 @@ type TargetManager struct {
 	targets map[string][]Target
 	// Providers by the scrape configs they are derived from.
 	providers map[*config.ScrapeConfig][]TargetProvider
+}
+
+var scrapeTransport = &http.Transport{
+	Proxy: http.ProxyFromEnvironment,
+	Dial: (&net.Dialer{
+		Timeout:   5 * time.Minute,
+		KeepAlive: 5 * time.Minute,
+	}).Dial,
+	TLSHandshakeTimeout: 10 * time.Second,
 }
 
 // NewTargetManager creates a new TargetManager.
