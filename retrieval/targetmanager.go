@@ -364,6 +364,9 @@ func ProvidersFromConfig(cfg *config.ScrapeConfig) ([]TargetProvider, error) {
 		dnsSD := discovery.NewDNSDiscovery(dnscfg.Names, time.Duration(dnscfg.RefreshInterval))
 		providers = append(providers, dnsSD)
 	}
+	for _, c := range cfg.ConsulSDConfigs {
+		providers = append(providers, discovery.NewConsulDiscovery(c))
+	}
 	if len(cfg.TargetGroups) > 0 {
 		providers = append(providers, NewStaticProvider(cfg.TargetGroups))
 	}
